@@ -1,0 +1,2265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O2 Configurador Profesional</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React y ReactDOM desde CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel Standalone para JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Datos de comisiones
+        const commissionRules = {
+            "comisiones": [
+                { "segmento": "Fibra + Móvil", "producto": "Convergente 56€", "comisionOriginal": 120, "comision90": 108 },
+                { "segmento": "Fibra + Móvil", "producto": "Convergente 50€", "comisionOriginal": 115, "comision90": 103.5 },
+                { "segmento": "Fibra + Móvil", "producto": "Convergente 45€", "comisionOriginal": 105, "comision90": 94.5 },
+                { "segmento": "Fibra + Móvil", "producto": "Convergente 38€", "comisionOriginal": 92, "comision90": 82.8 },
+                { "segmento": "Fibra + Móvil", "producto": "Convergente 35€", "comisionOriginal": 80, "comision90": 72 },
+                { "segmento": "Fibra + Móvil", "producto": "Convergente 35€ + 2LMA", "comisionOriginal": 83, "comision90": 74.7 },
+                { "segmento": "Solo Fibra", "producto": "Solo Fibra 31€", "comisionOriginal": 65, "comision90": 58.5 },
+                { "segmento": "Solo Fibra", "producto": "Solo Fibra 27€", "comisionOriginal": 50, "comision90": 45 },
+                { "segmento": "Fibra Segunda Residencia", "producto": "Fibra adicional 27€", "comisionOriginal": 21, "comision90": 18.9 },
+                { "segmento": "Fibra Segunda Residencia", "producto": "Fibra adicional 20€", "comisionOriginal": 15, "comision90": 13.5 },
+                { "segmento": "Fibra Segunda Residencia", "producto": "Fibra adicional 15€", "comisionOriginal": 11, "comision90": 9.9 },
+                { "segmento": "Solo Móvil", "producto": "Solo Móvil 20€", "comisionOriginal": 45, "comision90": 40.5 },
+                { "segmento": "Solo Móvil", "producto": "Solo Móvil 15€", "comisionOriginal": 36, "comision90": 32.4 },
+                { "segmento": "Solo Móvil", "producto": "Solo Móvil 10€", "comisionOriginal": 20, "comision90": 18 },
+                { "segmento": "Solo Móvil", "producto": "Solo Móvil 7€", "comisionOriginal": 10, "comision90": 9 },
+                { "segmento": "Líneas adicionales", "producto": "LA 15€", "comisionOriginal": 15, "comision90": 13.5 },
+                { "segmento": "Líneas adicionales", "producto": "LA 10€", "comisionOriginal": 14, "comision90": 12.6 },
+                { "segmento": "Líneas adicionales", "producto": "LA 5€", "comisionOriginal": 13, "comision90": 11.7 }
+            ]
+        };
+
+        // Datos del portfolio
+        const portfolioData = [
+            {"Segmento":"Móvil (solo línea)","Categoría":"Móvil (solo línea)","Producto":"50 GB","Precio":7},
+            {"Segmento":"Móvil (solo línea)","Categoría":"Móvil (solo línea)","Producto":"100 GB","Precio":10},
+            {"Segmento":"Móvil (solo línea)","Categoría":"Móvil (solo línea)","Producto":"150 GB","Precio":15},
+            {"Segmento":"Móvil (solo línea)","Categoría":"Móvil (solo línea)","Producto":"300 GB","Precio":20},
+            {"Segmento":"Líneas adicionales","Categoría":"Líneas adicionales (con fibra y móvil)","Producto":"40 GB","Precio":5},
+            {"Segmento":"Líneas adicionales","Categoría":"Líneas adicionales (con fibra y móvil)","Producto":"150 GB","Precio":10},
+            {"Segmento":"Líneas adicionales","Categoría":"Líneas adicionales (con fibra y móvil)","Producto":"300 GB","Precio":15},
+            {"Segmento":"Fibra (solo internet)","Categoría":"Fibra (solo internet fijo)","Producto":"600 Mb","Precio":27},
+            {"Segmento":"Fibra (solo internet)","Categoría":"Fibra (solo internet fijo)","Producto":"1 Gb","Precio":31},
+            {"Segmento":"Fibra + Móvil","Categoría":"Fibra + Móvil","Producto":"600 Mb + 60 GB (mejorada)","Precio":35},
+            {"Segmento":"Fibra + Móvil","Categoría":"Fibra + Móvil","Producto":"600 Mb + 2 líneas (10 GB + 40 GB)","Precio":35},
+            {"Segmento":"Fibra + Móvil","Categoría":"Fibra + Móvil","Producto":"1 Gb + 120 GB","Precio":38},
+            {"Segmento":"Fibra + Móvil + TV","Categoría":"Fibra + Móvil + TV","Producto":"600 Mb + 35 GB + Movistar+","Precio":38},
+            {"Segmento":"Fibra + Móvil + TV","Categoría":"Fibra + Móvil + TV","Producto":"600 Mb + 60 GB + Movistar+ + Netflix","Precio":45},
+            {"Segmento":"Fibra + Móvil + TV","Categoría":"Fibra + Móvil + TV","Producto":"1 Gb + 350 GB + Movistar+","Precio":50},
+            {"Segmento":"Fibra + Móvil + TV","Categoría":"Fibra + Móvil + TV","Producto":"1 Gb + 375 GB + Movistar+ + Netflix","Precio":56},
+            {"Segmento":"Fibra Segunda Residencia","Categoría":"Fibra Segunda Residencia","Producto":"300 Mb","Precio":15},
+            {"Segmento":"Fibra Segunda Residencia","Categoría":"Fibra Segunda Residencia","Producto":"600 Mb","Precio":20},
+            {"Segmento":"Fibra Segunda Residencia","Categoría":"Fibra Segunda Residencia","Producto":"1 Gb","Precio":27}
+        ];
+
+        const initialSellers = [
+            { id: 1, name: "Carlos Martínez", email: "carlos@o2.com", role: "vendedor", active: true, sales: 45, commission: 4320, target: 50, joinDate: "2023-01-15" },
+            { id: 2, name: "Ana García", email: "ana@o2.com", role: "vendedor", active: true, sales: 62, commission: 5890, target: 50, joinDate: "2023-03-20" },
+            { id: 3, name: "Luis Rodríguez", email: "luis@o2.com", role: "vendedor", active: true, sales: 38, commission: 3420, target: 40, joinDate: "2023-06-10" },
+            { id: 4, name: "María López", email: "maria@o2.com", role: "supervisor", active: true, sales: 78, commission: 7410, target: 70, joinDate: "2022-11-05" },
+            { id: 5, name: "Pedro Sánchez", email: "pedro@o2.com", role: "vendedor", active: false, sales: 15, commission: 1350, target: 30, joinDate: "2024-01-10" }
+        ];
+
+        // Funciones auxiliares
+        const getProductCommissionKey = (product) => {
+            const segmento = product.Segmento;
+            const precio = product.Precio;
+            
+            if (segmento === "Fibra + Móvil + TV") {
+                if (precio === 56) return "Convergente 56€";
+                if (precio === 50) return "Convergente 50€";
+                if (precio === 45) return "Convergente 45€";
+                if (precio === 38) return "Convergente 38€";
+                return null;
+            }
+            
+            if (segmento === "Fibra + Móvil") {
+                if (precio === 38) return "Convergente 38€";
+                if (precio === 35 && product.Producto.includes("2 líneas")) return "Convergente 35€ + 2LMA";
+                if (precio === 35) return "Convergente 35€";
+                return null;
+            }
+            
+            if (segmento === "Fibra (solo internet)") {
+                if (precio === 31) return "Solo Fibra 31€";
+                if (precio === 27) return "Solo Fibra 27€";
+                return null;
+            }
+            
+            if (segmento === "Fibra Segunda Residencia") {
+                if (precio === 27) return "Fibra adicional 27€";
+                if (precio === 20) return "Fibra adicional 20€";
+                if (precio === 15) return "Fibra adicional 15€";
+                return null;
+            }
+            
+            if (segmento === "Móvil (solo línea)") {
+                if (precio === 20) return "Solo Móvil 20€";
+                if (precio === 15) return "Solo Móvil 15€";
+                if (precio === 10) return "Solo Móvil 10€";
+                if (precio === 7) return "Solo Móvil 7€";
+                return null;
+            }
+            
+            if (segmento === "Líneas adicionales") {
+                if (precio === 15) return "LA 15€";
+                if (precio === 10) return "LA 10€";
+                if (precio === 5) return "LA 5€";
+                return null;
+            }
+            
+            return null;
+        };
+
+        const computeCommission = (configItems, commissionsData) => {
+            let totalCommission = 0;
+            const comms = commissionsData || commissionRules.comisiones;
+            
+            configItems.forEach(item => {
+                const commissionKey = getProductCommissionKey(item.product);
+                if (commissionKey) {
+                    const commissionData = comms.find(c => c.producto === commissionKey);
+                    if (commissionData) {
+                        totalCommission += commissionData.comision90 * item.quantity;
+                    }
+                }
+            });
+            
+            return totalCommission;
+        };
+
+        const calculateTotal = (configItems) => {
+            return configItems.reduce((total, item) => total + (item.product.Precio * item.quantity), 0);
+        };
+
+        // Componente Principal
+        function O2ProfessionalConfigurator() {
+            const [isLoggedIn, setIsLoggedIn] = useState(false);
+            const [userRole, setUserRole] = useState(null);
+            const [showLoginModal, setShowLoginModal] = useState(false);
+            
+            const [configuration, setConfiguration] = useState([]);
+            const [clientName, setClientName] = useState('');
+            const [clientEmail, setClientEmail] = useState('');
+            const [clientPhone, setClientPhone] = useState('');
+            const [activeTab, setActiveTab] = useState('customer');
+            const [selectedSegment, setSelectedSegment] = useState('');
+            const [searchTerm, setSearchTerm] = useState('');
+            
+            const [adminView, setAdminView] = useState('dashboard');
+            const [sellers, setSellers] = useState(initialSellers);
+            const [products, setProducts] = useState(portfolioData);
+            const [commissions, setCommissions] = useState(commissionRules.comisiones);
+            const [showAddProductModal, setShowAddProductModal] = useState(false);
+            const [showEditProductModal, setShowEditProductModal] = useState(false);
+            const [showEditCommissionModal, setShowEditCommissionModal] = useState(false);
+            const [newProduct, setNewProduct] = useState({
+                Segmento: '',
+                Categoría: '',
+                Producto: '',
+                Precio: 0
+            });
+            const [editingProduct, setEditingProduct] = useState(null);
+            const [editingProductIndex, setEditingProductIndex] = useState(null);
+            const [editingCommission, setEditingCommission] = useState(null);
+            const [editingCommissionIndex, setEditingCommissionIndex] = useState(null);
+            const [showAddSellerModal, setShowAddSellerModal] = useState(false);
+            const [newSeller, setNewSeller] = useState({
+                name: '',
+                email: '',
+                role: 'comercial',
+                target: 40
+            });
+
+            const handleLogin = (username, password) => {
+                if (username === 'admin' && password === 'admin123') {
+                    setIsLoggedIn(true);
+                    setUserRole('admin');
+                    setShowLoginModal(false);
+                    return true;
+                } else if (username === 'comercial' && password === 'venta123') {
+                    setIsLoggedIn(true);
+                    setUserRole('comercial');
+                    setShowLoginModal(false);
+                    return true;
+                }
+                return false;
+            };
+
+            const handleLogout = () => {
+                setIsLoggedIn(false);
+                setUserRole(null);
+                setConfiguration([]);
+                setClientName('');
+                setClientEmail('');
+                setClientPhone('');
+            };
+
+            const addProductToConfig = (product) => {
+                setConfiguration(prev => {
+                    const existing = prev.find(item => 
+                        item.product.Producto === product.Producto && 
+                        item.product.Segmento === product.Segmento
+                    );
+                    
+                    if (existing) {
+                        return prev.map(item =>
+                            item.product.Producto === product.Producto && item.product.Segmento === product.Segmento
+                                ? { ...item, quantity: item.quantity + 1 }
+                                : item
+                        );
+                    } else {
+                        return [...prev, { product, quantity: 1 }];
+                    }
+                });
+            };
+
+            const updateQuantity = (product, newQuantity) => {
+                if (newQuantity <= 0) {
+                    removeProduct(product);
+                    return;
+                }
+                
+                setConfiguration(prev => prev.map(item =>
+                    item.product.Producto === product.Producto && item.product.Segmento === product.Segmento
+                        ? { ...item, quantity: newQuantity }
+                        : item
+                ));
+            };
+
+            const removeProduct = (product) => {
+                setConfiguration(prev => prev.filter(item => 
+                    !(item.product.Producto === product.Producto && item.product.Segmento === product.Segmento)
+                ));
+            };
+
+            const clearConfiguration = () => {
+                if (window.confirm('¿Estás seguro de que quieres limpiar toda la configuración?')) {
+                    setConfiguration([]);
+                    setClientName('');
+                    setClientEmail('');
+                    setClientPhone('');
+                }
+            };
+
+            // Funciones para gestión de productos
+            const handleAddProduct = () => {
+                if (!newProduct.Producto || !newProduct.Segmento || !newProduct.Categoría || newProduct.Precio <= 0) {
+                    alert('Por favor, completa todos los campos correctamente');
+                    return;
+                }
+                setProducts([...products, { ...newProduct, Precio: parseFloat(newProduct.Precio) }]);
+                setNewProduct({ Segmento: '', Categoría: '', Producto: '', Precio: 0 });
+                setShowAddProductModal(false);
+                alert('✓ Producto añadido correctamente');
+            };
+
+            const handleEditProduct = (index) => {
+                setEditingProduct({ ...products[index] });
+                setEditingProductIndex(index);
+                setShowEditProductModal(true);
+            };
+
+            const handleSaveEditProduct = () => {
+                if (!editingProduct.Producto || !editingProduct.Segmento || !editingProduct.Categoría || editingProduct.Precio <= 0) {
+                    alert('Por favor, completa todos los campos correctamente');
+                    return;
+                }
+                const updatedProducts = [...products];
+                updatedProducts[editingProductIndex] = { ...editingProduct, Precio: parseFloat(editingProduct.Precio) };
+                setProducts(updatedProducts);
+                setShowEditProductModal(false);
+                setEditingProduct(null);
+                setEditingProductIndex(null);
+                alert('✓ Producto actualizado correctamente');
+            };
+
+            const handleDeleteProduct = (index) => {
+                if (window.confirm('¿Estás seguro de eliminar este producto?')) {
+                    setProducts(products.filter((_, i) => i !== index));
+                    alert('✓ Producto eliminado correctamente');
+                }
+            };
+
+            // Funciones para gestión de comisiones
+            const handleEditCommission = (index) => {
+                const comm = commissions[index];
+                setEditingCommission({
+                    ...comm,
+                    porcentaje: Math.round((comm.comision90 / comm.comisionOriginal) * 100),
+                    importeDirecto: comm.comision90
+                });
+                setEditingCommissionIndex(index);
+                setShowEditCommissionModal(true);
+            };
+
+            const handleChangePercentage = (newPercentage) => {
+                const percentage = parseFloat(newPercentage) || 0;
+                const newImporte = (editingCommission.comisionOriginal * percentage) / 100;
+                setEditingCommission({
+                    ...editingCommission,
+                    porcentaje: percentage,
+                    importeDirecto: parseFloat(newImporte.toFixed(2))
+                });
+            };
+
+            const handleChangeImporte = (newImporte) => {
+                const importe = parseFloat(newImporte) || 0;
+                const newPercentage = (importe / editingCommission.comisionOriginal) * 100;
+                setEditingCommission({
+                    ...editingCommission,
+                    importeDirecto: importe,
+                    porcentaje: parseFloat(newPercentage.toFixed(2))
+                });
+            };
+
+            const handleSaveEditCommission = () => {
+                if (editingCommission.importeDirecto < 0 || editingCommission.importeDirecto > editingCommission.comisionOriginal) {
+                    alert('Por favor, ingresa un importe válido entre 0€ y ' + editingCommission.comisionOriginal + '€');
+                    return;
+                }
+                const updatedCommissions = [...commissions];
+                updatedCommissions[editingCommissionIndex] = {
+                    ...editingCommission,
+                    comision90: parseFloat(editingCommission.importeDirecto.toFixed(2))
+                };
+                setCommissions(updatedCommissions);
+                setShowEditCommissionModal(false);
+                setEditingCommission(null);
+                setEditingCommissionIndex(null);
+                alert('✓ Comisión actualizada correctamente');
+            };
+
+            // Funciones para gestión de vendedores
+            const handleAddSeller = () => {
+                if (!newSeller.name || !newSeller.email) {
+                    alert('Por favor, completa el nombre y email del comercial');
+                    return;
+                }
+                const newId = sellers.length > 0 ? Math.max(...sellers.map(s => s.id)) + 1 : 1;
+                const newSellerData = {
+                    id: newId,
+                    name: newSeller.name,
+                    email: newSeller.email,
+                    role: newSeller.role,
+                    active: true,
+                    sales: 0,
+                    commission: 0,
+                    target: parseInt(newSeller.target) || 40,
+                    joinDate: new Date().toISOString().split('T')[0]
+                };
+                setSellers([...sellers, newSellerData]);
+                setNewSeller({ name: '', email: '', role: 'comercial', target: 40 });
+                setShowAddSellerModal(false);
+                alert('✓ Comercial añadido correctamente');
+            };
+
+            const handleDeleteSeller = (id) => {
+                if (window.confirm('¿Estás seguro de eliminar este comercial?')) {
+                    setSellers(sellers.filter(s => s.id !== id));
+                    alert('✓ Comercial eliminado correctamente');
+                }
+            };
+
+            const toggleSellerStatus = (id) => {
+                setSellers(sellers.map(seller => 
+                    seller.id === id ? { ...seller, active: !seller.active } : seller
+                ));
+            };
+
+            const generateCustomerOffer = () => {
+                if (!clientName || clientName.trim() === '') {
+                    window.alert('Por favor, ingresa el nombre del cliente');
+                    return;
+                }
+                
+                if (!configuration || configuration.length === 0) {
+                    window.alert('Por favor, añade al menos un producto a la configuración');
+                    return;
+                }
+                
+                const total = calculateTotal(configuration);
+                const date = new Date().toLocaleDateString('es-ES');
+                const refNumber = Date.now().toString().slice(-6);
+                
+                // Crear HTML para PDF
+                const htmlContent = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propuesta O2 - ${clientName}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1.5cm;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #333;
+            background: white;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #0066cc, #004499);
+            color: white;
+            padding: 30px;
+            margin: -20px -20px 30px -20px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .ref-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid rgba(255,255,255,0.3);
+            font-size: 14px;
+        }
+        .section {
+            margin: 25px 0;
+            page-break-inside: avoid;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0066cc;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #0066cc;
+        }
+        .client-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-left: 5px solid #0066cc;
+            margin-bottom: 20px;
+        }
+        .client-info div {
+            margin-bottom: 8px;
+        }
+        .product {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-left: 5px solid #0066cc;
+            padding: 20px;
+            margin: 15px 0;
+            page-break-inside: avoid;
+        }
+        .product-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #0066cc;
+            margin-bottom: 12px;
+        }
+        .product-details {
+            margin-left: 15px;
+        }
+        .product-detail {
+            margin: 6px 0;
+            color: #666;
+        }
+        .product-subtotal {
+            font-weight: bold;
+            color: #333;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+        .summary {
+            background: linear-gradient(135deg, #0066cc, #004499);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 30px 0;
+            page-break-inside: avoid;
+        }
+        .summary-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 12px 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .summary-total {
+            font-size: 24px;
+            padding-top: 15px;
+            border-top: 2px solid rgba(255,255,255,0.3);
+            margin-top: 15px;
+        }
+        .conditions {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .conditions ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .conditions li {
+            margin: 10px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        .conditions li:before {
+            content: "✓";
+            color: #0066cc;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        .print-button:hover {
+            background: #004499;
+        }
+        @media print {
+            body { 
+                margin: 0; 
+                padding: 0;
+            }
+            .header { 
+                margin-top: 0; 
+            }
+            .print-button { 
+                display: none; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="print-button" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+
+    <div class="header">
+        <div class="logo">O2</div>
+        <div class="title">PROPUESTA COMERCIAL</div>
+        <div class="ref-info">
+            <div><strong>Referencia:</strong> PROP-${refNumber}</div>
+            <div><strong>Fecha:</strong> ${date}</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">DATOS DEL CLIENTE</div>
+        <div class="client-info">
+            <div><strong>Cliente:</strong> ${clientName}</div>
+            ${clientEmail ? `<div><strong>Email:</strong> ${clientEmail}</div>` : ''}
+            ${clientPhone ? `<div><strong>Teléfono:</strong> ${clientPhone}</div>` : ''}
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">SERVICIOS PROPUESTOS</div>
+        ${configuration.map((item, index) => `
+            <div class="product">
+                <div class="product-title">${index + 1}. ${item.product.Producto}</div>
+                <div class="product-details">
+                    <div class="product-detail"><strong>Segmento:</strong> ${item.product.Segmento}</div>
+                    <div class="product-detail"><strong>Cantidad:</strong> ${item.quantity} ${item.quantity > 1 ? 'líneas' : 'línea'}</div>
+                    <div class="product-detail"><strong>Precio unitario:</strong> ${item.product.Precio}€/mes</div>
+                    <div class="product-subtotal">Subtotal: ${item.quantity * item.product.Precio}€/mes</div>
+                </div>
+            </div>
+        `).join('')}
+    </div>
+
+    <div class="summary">
+        <div class="summary-title">RESUMEN ECONÓMICO</div>
+        <div class="summary-row">
+            <span>TOTAL MENSUAL:</span>
+            <span>${total}€</span>
+        </div>
+        <div class="summary-row summary-total">
+            <span>TOTAL ANUAL:</span>
+            <span>${(total * 12).toLocaleString()}€</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">CONDICIONES</div>
+        <div class="conditions">
+            <ul>
+                <li>Propuesta válida por 30 días</li>
+                <li>Precios incluyen IVA</li>
+                <li>Instalación sujeta a viabilidad técnica</li>
+                <li>Permanencia según condiciones generales</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer">
+        <strong>Equipo Comercial O2</strong><br>
+        Configurado con O2 Configurador Pro
+    </div>
+</body>
+</html>`;
+                
+                // Abrir en nueva ventana
+                const printWindow = window.open('', '_blank', 'width=900,height=800');
+                if (printWindow) {
+                    printWindow.document.write(htmlContent);
+                    printWindow.document.close();
+                    printWindow.focus();
+                } else {
+                    alert('Por favor, permite las ventanas emergentes para generar la propuesta');
+                }
+            };
+
+            const copyForWhatsApp = () => {
+                if (configuration.length === 0) {
+                    alert('No hay productos en la configuración');
+                    return;
+                }
+                
+                const total = calculateTotal(configuration);
+                
+                const text = `🔵 *PROPUESTA O2 - ${clientName || 'Cliente'}*\n\n${configuration.map((item, index) => 
+                    `${index + 1}. *${item.product.Producto}*\n   ${item.quantity} unidades × ${item.product.Precio}€ = *${item.quantity * item.product.Precio}€/mes*`
+                ).join('\n\n')}\n\n💰 *TOTAL MENSUAL: ${total}€*\n💳 *TOTAL ANUAL: ${(total * 12).toLocaleString()}€*\n\n✅ *Propuesta válida 30 días*\n📞 ¿Te parece bien esta configuración?`;
+                
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('✓ Texto copiado para WhatsApp');
+                }).catch(err => {
+                    console.error('Error al copiar:', err);
+                    alert('No se pudo copiar. Intenta de nuevo.');
+                });
+            };
+
+            const getCommissionBreakdown = (configItems, commissionsData) => {
+                const breakdown = [];
+                const comms = commissionsData || commissionRules.comisiones;
+                
+                configItems.forEach(item => {
+                    const commissionKey = getProductCommissionKey(item.product);
+                    let unitCommission = 0;
+                    let hasCommission = false;
+                    
+                    if (commissionKey) {
+                        const commissionData = comms.find(c => c.producto === commissionKey);
+                        if (commissionData) {
+                            unitCommission = commissionData.comision90;
+                            hasCommission = true;
+                        }
+                    }
+                    
+                    breakdown.push({
+                        product: item.product.Producto,
+                        segment: item.product.Segmento,
+                        quantity: item.quantity,
+                        unitPrice: item.product.Precio,
+                        unitCommission,
+                        totalCommission: unitCommission * item.quantity,
+                        hasCommission
+                    });
+                });
+                
+                return breakdown;
+            };
+
+            const generateCommissionReport = () => {
+                if (!configuration || configuration.length === 0) {
+                    window.alert('No hay productos configurados para generar el informe');
+                    return;
+                }
+                
+                const total = calculateTotal(configuration);
+                const commission = computeCommission(configuration, userRole === 'admin' ? commissions : null);
+                const breakdown = getCommissionBreakdown(configuration, userRole === 'admin' ? commissions : null);
+                const date = new Date().toLocaleDateString('es-ES');
+                const refNumber = Date.now().toString().slice(-6);
+                
+                const htmlContent = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe de Comisiones - ${clientName || 'Cliente'}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1.5cm;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #333;
+            background: white;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 30px;
+            margin: -20px -20px 30px -20px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .ref-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid rgba(255,255,255,0.3);
+            font-size: 14px;
+        }
+        .section {
+            margin: 25px 0;
+            page-break-inside: avoid;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #10b981;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #10b981;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: #f0fdf4;
+            border: 2px solid #10b981;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .metric-label {
+            font-size: 14px;
+            color: #059669;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .metric-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #10b981;
+        }
+        .metric-subtitle {
+            font-size: 12px;
+            color: #059669;
+            margin-top: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th {
+            background: #10b981;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        tr:nth-child(even) {
+            background: #f9fafb;
+        }
+        .commission-yes {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        .commission-no {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        .total-row {
+            background: #10b981 !important;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .total-row td {
+            padding: 15px 12px;
+            border: none;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        .print-button:hover {
+            background: #059669;
+        }
+        @media print {
+            body { 
+                margin: 0; 
+                padding: 0;
+            }
+            .header { 
+                margin-top: 0; 
+            }
+            .print-button { 
+                display: none; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="print-button" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+
+    <div class="header">
+        <div class="logo">O2</div>
+        <div class="title">INFORME DE COMISIONES</div>
+        <div class="ref-info">
+            <div><strong>Referencia:</strong> COM-${refNumber}</div>
+            <div><strong>Fecha:</strong> ${date}</div>
+            <div><strong>Cliente:</strong> ${clientName || 'Sin asignar'}</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">RESUMEN GENERAL</div>
+        <div class="metrics">
+            <div class="metric-card">
+                <div class="metric-label">💰 Facturación Total</div>
+                <div class="metric-value">${total}€</div>
+                <div class="metric-subtitle">mensual</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">💵 Comisión Total</div>
+                <div class="metric-value">${commission.toFixed(2)}€</div>
+                <div class="metric-subtitle">por esta venta</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">📦 Total Productos</div>
+                <div class="metric-value">${totalItems}</div>
+                <div class="metric-subtitle">servicios configurados</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">DESGLOSE DE COMISIONES POR PRODUCTO</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Segmento</th>
+                    <th style="text-align: center;">Cant.</th>
+                    <th style="text-align: right;">Precio Unit.</th>
+                    <th style="text-align: right;">Comisión Unit.</th>
+                    <th style="text-align: right;">Comisión Total</th>
+                    <th style="text-align: center;">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${breakdown.map(item => `
+                    <tr>
+                        <td><strong>${item.product}</strong></td>
+                        <td>${item.segment}</td>
+                        <td style="text-align: center;"><strong>${item.quantity}</strong></td>
+                        <td style="text-align: right;">${item.unitPrice}€</td>
+                        <td style="text-align: right;">${item.hasCommission ? item.unitCommission + '€' : '-'}</td>
+                        <td style="text-align: right;"><strong>${item.hasCommission ? item.totalCommission.toFixed(2) + '€' : '0€'}</strong></td>
+                        <td style="text-align: center;">
+                            <span class="${item.hasCommission ? 'commission-yes' : 'commission-no'}">
+                                ${item.hasCommission ? '✓ Comisionable' : '✗ Sin comisión'}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('')}
+                <tr class="total-row">
+                    <td colspan="5" style="text-align: right;">TOTAL COMISIONES:</td>
+                    <td style="text-align: right;">${commission.toFixed(2)}€</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        <strong>O2 Configurador Profesional</strong><br>
+        Informe generado automáticamente - ${date}
+    </div>
+</body>
+</html>`;
+                
+                const printWindow = window.open('', '_blank', 'width=900,height=800');
+                if (printWindow) {
+                    printWindow.document.write(htmlContent);
+                    printWindow.document.close();
+                    printWindow.focus();
+                } else {
+                    alert('Por favor, permite las ventanas emergentes para generar el informe');
+                }
+            };
+
+            const segments = [...new Set(products.map(item => item.Segmento))];
+            const filteredProducts = products.filter(product => {
+                const matchesSegment = !selectedSegment || product.Segmento === selectedSegment;
+                const matchesSearch = !searchTerm || 
+                    product.Producto.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    product.Segmento.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    product.Categoría.toLowerCase().includes(searchTerm.toLowerCase());
+                return matchesSegment && matchesSearch;
+            });
+
+            const total = calculateTotal(configuration);
+            const commission = computeCommission(configuration, userRole === 'admin' ? commissions : null);
+            const totalItems = configuration.reduce((sum, item) => sum + item.quantity, 0);
+            const commissionPercentage = total > 0 ? (commission / total) * 100 : 0;
+
+            // Modal de Login
+            const LoginModal = () => {
+                const [username, setUsername] = useState('');
+                const [password, setPassword] = useState('');
+                const [error, setError] = useState('');
+                
+                if (!showLoginModal) return null;
+                
+                return (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-2xl font-bold text-gray-900">Iniciar Sesión</h2>
+                                <button
+                                    onClick={() => {
+                                        setShowLoginModal(false);
+                                        setError('');
+                                    }}
+                                    className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                            
+                            {error && (
+                                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
+                                    {error}
+                                </div>
+                            )}
+                            
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Usuario
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        onKeyPress={(e) => {
+                                            if (e.key === 'Enter') {
+                                                const success = handleLogin(username, password);
+                                                if (!success) setError('Credenciales incorrectas');
+                                            }
+                                        }}
+                                        className="w-full p-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Ingrese su usuario"
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Contraseña
+                                    </label>
+                                    <input
+                                        type="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        onKeyPress={(e) => {
+                                            if (e.key === 'Enter') {
+                                                const success = handleLogin(username, password);
+                                                if (!success) setError('Credenciales incorrectas');
+                                            }
+                                        }}
+                                        className="w-full p-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Ingrese su contraseña"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <button
+                                onClick={() => {
+                                    const success = handleLogin(username, password);
+                                    if (!success) setError('Credenciales incorrectas');
+                                }}
+                                className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition-colors"
+                            >
+                                Iniciar Sesión
+                            </button>
+                        </div>
+                    </div>
+                );
+            };
+
+            // Vista inicial sin login
+            if (!isLoggedIn) {
+                return (
+                    <>
+                        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
+                            <div className="max-w-4xl w-full mx-auto px-6">
+                                <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+                                    <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-12 text-white text-center">
+                                        <div className="w-20 h-20 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                                            <span className="text-4xl">⚙️</span>
+                                        </div>
+                                        <h1 className="text-4xl font-bold mb-4">O2 Configurador Profesional</h1>
+                                        <p className="text-xl text-blue-100">Herramienta avanzada de configuración comercial</p>
+                                    </div>
+                                    
+                                    <div className="p-12">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                                            <div className="text-center">
+                                                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                                                    <span className="text-3xl">🧮</span>
+                                                </div>
+                                                <h3 className="text-lg font-bold mb-2">Configuración Rápida</h3>
+                                                <p className="text-gray-600">Crea propuestas personalizadas en minutos</p>
+                                            </div>
+                                            <div className="text-center">
+                                                <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                                                    <span className="text-3xl">📈</span>
+                                                </div>
+                                                <h3 className="text-lg font-bold mb-2">Análisis de Rentabilidad</h3>
+                                                <p className="text-gray-600">Visualiza comisiones y márgenes al instante</p>
+                                            </div>
+                                            <div className="text-center">
+                                                <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                                                    <span className="text-3xl">👥</span>
+                                                </div>
+                                                <h3 className="text-lg font-bold mb-2">Gestión de Equipo</h3>
+                                                <p className="text-gray-600">Panel administrativo completo</p>
+                                            </div>
+                                            <div className="text-center">
+                                                <div className="w-16 h-16 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                                                    <span className="text-3xl">📤</span>
+                                                </div>
+                                                <h3 className="text-lg font-bold mb-2">Exportación Flexible</h3>
+                                                <p className="text-gray-600">Genera propuestas y comparte por WhatsApp</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="flex justify-center">
+                                            <button
+                                                onClick={() => setShowLoginModal(true)}
+                                                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all transform hover:scale-105 flex items-center gap-3"
+                                            >
+                                                <span>🔒</span>
+                                                Iniciar Sesión
+                                            </button>
+                                        </div>
+                                        
+                                        <div className="mt-8 text-center text-sm text-gray-500">
+                                            <p>© 2024 O2 Configurador Profesional - Todos los derechos reservados</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <LoginModal />
+                    </>
+                );
+            }
+
+            // Vista del vendedor
+            if (userRole === 'comercial') {
+                return (
+                    <>
+                        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+                            <header className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white shadow-2xl">
+                                <div className="max-w-7xl mx-auto px-6 py-6">
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+                                                <span className="text-2xl">⚙️</span>
+                                            </div>
+                                            <div>
+                                                <h1 className="text-3xl font-bold">O2 Configurador</h1>
+                                                <p className="text-blue-100 font-medium">Herramienta profesional</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-6">
+                                            <div className="text-right">
+                                                <p className="text-sm text-blue-200 font-medium">Cliente actual</p>
+                                                <p className="text-lg font-semibold">{clientName || 'Sin asignar'}</p>
+                                            </div>
+                                            {totalItems > 0 && (
+                                                <div className="bg-white bg-opacity-20 px-4 py-2 rounded-xl">
+                                                    <div className="text-center">
+                                                        <div className="text-2xl font-bold">{totalItems}</div>
+                                                        <div className="text-xs text-blue-200">productos</div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {total > 0 && (
+                                                <div className="bg-white bg-opacity-20 px-4 py-2 rounded-xl">
+                                                    <div className="text-center">
+                                                        <div className="text-2xl font-bold">{total}€</div>
+                                                        <div className="text-xs text-blue-200">mensual</div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            <button
+                                                onClick={handleLogout}
+                                                className="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-xl transition-colors"
+                                            >
+                                                🚪 Salir
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </header>
+
+                            <div className="max-w-7xl mx-auto px-6 py-8">
+                                <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <span className="text-2xl">👤</span>
+                                        <h2 className="text-xl font-bold">Información del Cliente</h2>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">Nombre del cliente *</label>
+                                            <input
+                                                type="text"
+                                                value={clientName}
+                                                onChange={(e) => setClientName(e.target.value)}
+                                                placeholder="Nombre completo"
+                                                className="w-full p-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                                            <input
+                                                type="email"
+                                                value={clientEmail}
+                                                onChange={(e) => setClientEmail(e.target.value)}
+                                                placeholder="email@ejemplo.com"
+                                                className="w-full p-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">Teléfono</label>
+                                            <input
+                                                type="tel"
+                                                value={clientPhone}
+                                                onChange={(e) => setClientPhone(e.target.value)}
+                                                placeholder="600 123 456"
+                                                className="w-full p-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div className="flex items-end">
+                                            <button
+                                                onClick={clearConfiguration}
+                                                className="w-full px-4 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-xl transition-colors font-semibold"
+                                            >
+                                                Nueva configuración
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-2xl shadow-lg mb-8 overflow-hidden">
+                                    <div className="border-b border-gray-200">
+                                        <nav className="flex">
+                                            <button
+                                                onClick={() => setActiveTab('customer')}
+                                                className={`flex-1 px-8 py-6 text-base font-semibold transition-all ${
+                                                    activeTab === 'customer'
+                                                        ? 'border-b-4 border-blue-500 text-blue-600 bg-blue-50'
+                                                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                                }`}
+                                            >
+                                                📄 Configuración
+                                            </button>
+                                            <button
+                                                onClick={() => setActiveTab('commission')}
+                                                className={`flex-1 px-8 py-6 text-base font-semibold transition-all ${
+                                                    activeTab === 'commission'
+                                                        ? 'border-b-4 border-blue-500 text-blue-600 bg-blue-50'
+                                                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                                }`}
+                                            >
+                                                📈 Rentabilidad {commission > 0 && `(${commission.toFixed(0)}€)`}
+                                            </button>
+                                        </nav>
+                                    </div>
+                                </div>
+
+                                {activeTab === 'customer' ? (
+                                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                                        <div className="lg:col-span-3">
+                                            <div className="bg-white rounded-2xl shadow-lg p-8">
+                                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                                                    <h2 className="text-xl font-bold">Catálogo de Productos</h2>
+                                                    <div className="flex gap-3 w-full sm:w-auto">
+                                                        <input
+                                                            type="text"
+                                                            value={searchTerm}
+                                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                                            placeholder="🔍 Buscar..."
+                                                            className="flex-1 sm:w-64 px-4 py-2 border-2 border-gray-200 rounded-xl"
+                                                        />
+                                                        <select
+                                                            value={selectedSegment}
+                                                            onChange={(e) => setSelectedSegment(e.target.value)}
+                                                            className="px-4 py-2 border-2 border-gray-200 rounded-xl"
+                                                        >
+                                                            <option value="">Todos</option>
+                                                            {segments.map(segment => (
+                                                                <option key={segment} value={segment}>{segment}</option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    {filteredProducts.map((product, index) => {
+                                                        const existingItem = configuration.find(item => 
+                                                            item.product.Producto === product.Producto && 
+                                                            item.product.Segmento === product.Segmento
+                                                        );
+                                                        
+                                                        return (
+                                                            <div key={index} className={`relative border-2 rounded-2xl p-6 transition-all ${
+                                                                existingItem ? 'border-blue-300 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
+                                                            }`}>
+                                                                {existingItem && (
+                                                                    <div className="absolute top-4 right-4 bg-blue-600 text-white text-sm font-bold w-8 h-8 rounded-full flex items-center justify-center">
+                                                                        {existingItem.quantity}
+                                                                    </div>
+                                                                )}
+                                                                
+                                                                <div className="mb-4">
+                                                                    <span className={`inline-block text-xs font-semibold px-3 py-1 rounded-full mb-3 ${
+                                                                        product.Segmento === 'Fibra + Móvil + TV' ? 'bg-purple-100 text-purple-800' :
+                                                                        product.Segmento === 'Fibra + Móvil' ? 'bg-blue-100 text-blue-800' :
+                                                                        product.Segmento === 'Fibra (solo internet)' ? 'bg-cyan-100 text-cyan-800' :
+                                                                        product.Segmento === 'Móvil (solo línea)' ? 'bg-green-100 text-green-800' :
+                                                                        product.Segmento === 'Líneas adicionales' ? 'bg-orange-100 text-orange-800' :
+                                                                        'bg-gray-100 text-gray-800'
+                                                                    }`}>
+                                                                        {product.Segmento}
+                                                                    </span>
+                                                                    <h3 className="font-bold text-gray-900 mb-2 text-lg">{product.Producto}</h3>
+                                                                    <p className="text-sm text-gray-600">{product.Categoría}</p>
+                                                                    <div className="text-2xl font-bold text-blue-600 mt-2">{product.Precio}€<span className="text-xs text-gray-500">/mes</span></div>
+                                                                </div>
+                                                                
+                                                                <div className="flex gap-3">
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            if (existingItem) {
+                                                                                updateQuantity(product, existingItem.quantity - 1);
+                                                                            }
+                                                                        }}
+                                                                        disabled={!existingItem}
+                                                                        className="flex-1 bg-red-50 hover:bg-red-100 disabled:bg-gray-50 disabled:text-gray-400 text-red-700 px-4 py-3 rounded-xl font-semibold border border-red-200 disabled:border-gray-200"
+                                                                    >
+                                                                        ➖ Quitar
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => addProductToConfig(product)}
+                                                                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl font-semibold shadow-md"
+                                                                    >
+                                                                        ➕ Añadir
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="lg:col-span-1">
+                                            <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-8">
+                                                <h2 className="text-lg font-bold mb-6">🧮 Configuración Actual</h2>
+                                                
+                                                {configuration.length === 0 ? (
+                                                    <div className="text-center py-12">
+                                                        <span className="text-6xl">📦</span>
+                                                        <p className="text-gray-500 mt-4">Sin productos</p>
+                                                    </div>
+                                                ) : (
+                                                    <div className="space-y-4">
+                                                        {configuration.map((item, index) => (
+                                                            <div key={index} className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                                                                <div className="flex justify-between items-start mb-3">
+                                                                    <h4 className="font-semibold text-sm">{item.product.Producto}</h4>
+                                                                    <button
+                                                                        onClick={() => removeProduct(item.product)}
+                                                                        className="text-red-500 hover:text-red-700"
+                                                                    >
+                                                                        🗑️
+                                                                    </button>
+                                                                </div>
+                                                                <div className="flex items-center justify-between">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <button
+                                                                            onClick={() => updateQuantity(item.product, item.quantity - 1)}
+                                                                            className="w-8 h-8 border-2 border-gray-300 rounded-lg hover:bg-gray-100"
+                                                                        >
+                                                                            -
+                                                                        </button>
+                                                                        <span className="w-8 text-center font-bold">{item.quantity}</span>
+                                                                        <button
+                                                                            onClick={() => updateQuantity(item.product, item.quantity + 1)}
+                                                                            className="w-8 h-8 border-2 border-gray-300 rounded-lg hover:bg-gray-100"
+                                                                        >
+                                                                            +
+                                                                        </button>
+                                                                    </div>
+                                                                    <div className="text-right">
+                                                                        <div className="font-bold text-blue-600">{item.quantity * item.product.Precio}€/mes</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                        
+                                                        <div className="border-t-2 border-gray-200 pt-6">
+                                                            <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-4 mb-6">
+                                                                <div className="flex justify-between items-center mb-2">
+                                                                    <span className="font-semibold">Total mensual:</span>
+                                                                    <span className="font-bold text-2xl text-blue-600">{total}€</span>
+                                                                </div>
+                                                                <div className="flex justify-between text-sm text-gray-600">
+                                                                    <span>Total anual:</span>
+                                                                    <span className="font-semibold">{(total * 12).toLocaleString()}€</span>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div className="space-y-3">
+                                                                <button
+                                                                    onClick={generateCustomerOffer}
+                                                                    disabled={!clientName || configuration.length === 0}
+                                                                    className={`w-full py-3 rounded-xl font-semibold ${
+                                                                        !clientName || configuration.length === 0 
+                                                                            ? 'bg-gray-300 text-gray-500' 
+                                                                            : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                                                    }`}
+                                                                >
+                                                                    📥 Generar Propuesta
+                                                                </button>
+                                                                
+                                                                <button
+                                                                    onClick={copyForWhatsApp}
+                                                                    disabled={configuration.length === 0}
+                                                                    className={`w-full py-3 rounded-xl font-semibold ${
+                                                                        configuration.length === 0 
+                                                                            ? 'bg-gray-300 text-gray-500' 
+                                                                            : 'bg-green-600 hover:bg-green-700 text-white'
+                                                                    }`}
+                                                                >
+                                                                    💬 WhatsApp
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="bg-white rounded-2xl shadow-lg p-8">
+                                        <div className="flex justify-between items-center mb-6">
+                                            <h2 className="text-2xl font-bold">📊 Análisis de Rentabilidad</h2>
+                                            {configuration.length > 0 && (
+                                                <button
+                                                    onClick={generateCommissionReport}
+                                                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2"
+                                                >
+                                                    📥 Descargar Informe de Comisiones
+                                                </button>
+                                            )}
+                                        </div>
+                                        
+                                        {configuration.length > 0 ? (
+                                            <div className="space-y-6">
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                    <div className="bg-blue-50 p-6 rounded-xl">
+                                                        <h3 className="font-bold text-blue-900 mb-2">💰 Facturación</h3>
+                                                        <div className="text-3xl font-bold text-blue-600">{total}€</div>
+                                                        <div className="text-sm text-blue-700">mensual</div>
+                                                    </div>
+                                                    <div className="bg-green-50 p-6 rounded-xl">
+                                                        <h3 className="font-bold text-green-900 mb-2">💵 Comisión</h3>
+                                                        <div className="text-3xl font-bold text-green-600">{commission.toFixed(2)}€</div>
+                                                        <div className="text-sm text-green-700">por venta</div>
+                                                    </div>
+                                                    <div className="bg-purple-50 p-6 rounded-xl">
+                                                        <h3 className="font-bold text-purple-900 mb-2">📦 Productos</h3>
+                                                        <div className="text-3xl font-bold text-purple-600">{totalItems}</div>
+                                                        <div className="text-sm text-purple-700">configurados</div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+                                                    <h3 className="font-bold text-gray-900 mb-6 text-lg">Desglose por Producto</h3>
+                                                    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                                                        <div className="overflow-x-auto">
+                                                            <table className="w-full">
+                                                                <thead className="bg-gray-100">
+                                                                    <tr>
+                                                                        <th className="px-6 py-4 text-left font-bold text-gray-900 border-b border-gray-200">Producto</th>
+                                                                        <th className="px-4 py-4 text-center font-bold text-gray-900 border-b border-gray-200">Cant.</th>
+                                                                        <th className="px-4 py-4 text-right font-bold text-gray-900 border-b border-gray-200">Precio Unit.</th>
+                                                                        <th className="px-4 py-4 text-right font-bold text-gray-900 border-b border-gray-200">Comisión Unit.</th>
+                                                                        <th className="px-4 py-4 text-right font-bold text-gray-900 border-b border-gray-200">Comisión Total</th>
+                                                                        <th className="px-4 py-4 text-center font-bold text-gray-900 border-b border-gray-200">Estado</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody className="bg-white">
+                                                                    {getCommissionBreakdown(configuration, userRole === 'admin' ? commissions : null).map((item, index) => (
+                                                                        <tr key={index} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
+                                                                            <td className="px-6 py-4 border-b border-gray-200">
+                                                                                <div className="font-semibold text-gray-900">{item.product}</div>
+                                                                                <div className="text-sm text-gray-600">{item.segment}</div>
+                                                                            </td>
+                                                                            <td className="px-4 py-4 text-center border-b border-gray-200">
+                                                                                <span className="bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full text-sm">
+                                                                                    {item.quantity}
+                                                                                </span>
+                                                                            </td>
+                                                                            <td className="px-4 py-4 text-right border-b border-gray-200">
+                                                                                <span className="font-semibold text-gray-900">{item.unitPrice}€</span>
+                                                                            </td>
+                                                                            <td className="px-4 py-4 text-right border-b border-gray-200">
+                                                                                {item.hasCommission ? (
+                                                                                    <span className="font-bold text-green-600">{item.unitCommission}€</span>
+                                                                                ) : (
+                                                                                    <span className="text-gray-400 font-medium">-</span>
+                                                                                )}
+                                                                            </td>
+                                                                            <td className="px-4 py-4 text-right border-b border-gray-200">
+                                                                                {item.hasCommission ? (
+                                                                                    <span className="font-bold text-green-600 text-lg">
+                                                                                        {item.totalCommission.toFixed(2)}€
+                                                                                    </span>
+                                                                                ) : (
+                                                                                    <span className="text-gray-400 font-medium">0€</span>
+                                                                                )}
+                                                                            </td>
+                                                                            <td className="px-4 py-4 text-center border-b border-gray-200">
+                                                                                {item.hasCommission ? (
+                                                                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">
+                                                                                        ✓ Comisionable
+                                                                                    </span>
+                                                                                ) : (
+                                                                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800">
+                                                                                        ✗ Sin comisión
+                                                                                    </span>
+                                                                                )}
+                                                                            </td>
+                                                                        </tr>
+                                                                    ))}
+                                                                </tbody>
+                                                                <tfoot className="bg-gray-100">
+                                                                    <tr>
+                                                                        <td colSpan={4} className="px-6 py-4 text-right font-bold text-gray-900 border-t-2 border-gray-300">
+                                                                            TOTAL COMISIONES:
+                                                                        </td>
+                                                                        <td className="px-4 py-4 text-right font-bold text-green-600 text-xl border-t-2 border-gray-300">
+                                                                            {commission.toFixed(2)}€
+                                                                        </td>
+                                                                        <td className="px-4 py-4 border-t-2 border-gray-300"></td>
+                                                                    </tr>
+                                                                </tfoot>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="text-center py-20">
+                                                <span className="text-6xl">📊</span>
+                                                <h3 className="text-xl font-bold mt-4 mb-2">Sin configuración activa</h3>
+                                                <p className="text-gray-600 mb-4">Configura productos para ver el análisis</p>
+                                                <button
+                                                    onClick={() => setActiveTab('customer')}
+                                                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold"
+                                                >
+                                                    Ir a Configuración
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <LoginModal />
+                    </>
+                );
+            }
+
+            // Vista de administrador (simplificada para mantener el tamaño del archivo)
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+                    <header className="bg-gradient-to-r from-purple-600 via-purple-700 to-purple-800 text-white shadow-2xl">
+                        <div className="max-w-7xl mx-auto px-6 py-6">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h1 className="text-3xl font-bold">🛡️ Panel de Administración</h1>
+                                    <p className="text-purple-100">Gestión integral del equipo comercial</p>
+                                </div>
+                                <button
+                                    onClick={handleLogout}
+                                    className="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-xl"
+                                >
+                                    🚪 Cerrar Sesión
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+
+                    <div className="max-w-7xl mx-auto px-6 py-8">
+                        {/* Tabs del Admin */}
+                        <div className="bg-white rounded-2xl shadow-lg mb-8 overflow-hidden">
+                            <div className="border-b border-gray-200">
+                                <nav className="flex">
+                                    <button
+                                        onClick={() => setAdminView('dashboard')}
+                                        className={`flex-1 px-6 py-6 text-base font-semibold transition-all ${
+                                            adminView === 'dashboard'
+                                                ? 'border-b-4 border-purple-500 text-purple-600 bg-purple-50'
+                                                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        📊 Dashboard
+                                    </button>
+                                    <button
+                                        onClick={() => setAdminView('products')}
+                                        className={`flex-1 px-6 py-6 text-base font-semibold transition-all ${
+                                            adminView === 'products'
+                                                ? 'border-b-4 border-purple-500 text-purple-600 bg-purple-50'
+                                                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        📦 Productos
+                                    </button>
+                                    <button
+                                        onClick={() => setAdminView('commissions')}
+                                        className={`flex-1 px-6 py-6 text-base font-semibold transition-all ${
+                                            adminView === 'commissions'
+                                                ? 'border-b-4 border-purple-500 text-purple-600 bg-purple-50'
+                                                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        💰 Comisiones
+                                    </button>
+                                    <button
+                                        onClick={() => setAdminView('sellers')}
+                                        className={`flex-1 px-6 py-6 text-base font-semibold transition-all ${
+                                            adminView === 'sellers'
+                                                ? 'border-b-4 border-purple-500 text-purple-600 bg-purple-50'
+                                                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        👥 Comerciales
+                                    </button>
+                                </nav>
+                            </div>
+                        </div>
+
+                        {/* Dashboard */}
+                        {adminView === 'dashboard' && (
+                            <div className="bg-white rounded-2xl shadow-lg p-8">
+                                <h2 className="text-2xl font-bold mb-6">📊 Dashboard</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                                    <div className="bg-blue-50 p-6 rounded-xl">
+                                        <h3 className="font-bold text-blue-900 mb-2">Ventas Totales</h3>
+                                        <div className="text-3xl font-bold text-blue-600">{sellers.reduce((sum, s) => sum + s.sales, 0)}</div>
+                                        <div className="text-sm text-blue-700">Este mes</div>
+                                    </div>
+                                    <div className="bg-green-50 p-6 rounded-xl">
+                                        <h3 className="font-bold text-green-900 mb-2">Comisiones</h3>
+                                        <div className="text-3xl font-bold text-green-600">{sellers.reduce((sum, s) => sum + s.commission, 0)}€</div>
+                                        <div className="text-sm text-green-700">Total generado</div>
+                                    </div>
+                                    <div className="bg-purple-50 p-6 rounded-xl">
+                                        <h3 className="font-bold text-purple-900 mb-2">Comerciales</h3>
+                                        <div className="text-3xl font-bold text-purple-600">{sellers.filter(s => s.active).length}</div>
+                                        <div className="text-sm text-purple-700">Activos</div>
+                                    </div>
+                                    <div className="bg-orange-50 p-6 rounded-xl">
+                                        <h3 className="font-bold text-orange-900 mb-2">Productos</h3>
+                                        <div className="text-3xl font-bold text-orange-600">{products.length}</div>
+                                        <div className="text-sm text-orange-700">En catálogo</div>
+                                    </div>
+                                </div>
+
+                                <div className="mt-8">
+                                    <h3 className="text-xl font-bold mb-4">👥 Top Comerciales</h3>
+                                    {sellers.filter(s => s.active).sort((a, b) => b.sales - a.sales).slice(0, 3).map((seller, index) => (
+                                        <div key={seller.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl mb-3">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white ${
+                                                    index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : 'bg-orange-500'
+                                                }`}>
+                                                    {index + 1}
+                                                </div>
+                                                <div>
+                                                    <div className="font-semibold">{seller.name}</div>
+                                                    <div className="text-sm text-gray-600">{seller.sales} ventas</div>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="font-bold text-green-600">{seller.commission}€</div>
+                                                <div className="text-sm text-gray-600">{((seller.sales / seller.target) * 100).toFixed(0)}% objetivo</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Gestión de Productos */}
+                        {adminView === 'products' && (
+                            <div className="bg-white rounded-2xl shadow-lg p-8">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-2xl font-bold">📦 Gestión de Productos</h2>
+                                    <button
+                                        onClick={() => setShowAddProductModal(true)}
+                                        className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2"
+                                    >
+                                        ➕ Añadir Producto
+                                    </button>
+                                </div>
+
+                                <div className="overflow-x-auto">
+                                    <table className="w-full">
+                                        <thead className="bg-gray-100">
+                                            <tr>
+                                                <th className="px-4 py-4 text-left font-bold text-gray-900">Producto</th>
+                                                <th className="px-4 py-4 text-left font-bold text-gray-900">Segmento</th>
+                                                <th className="px-4 py-4 text-left font-bold text-gray-900">Categoría</th>
+                                                <th className="px-4 py-4 text-center font-bold text-gray-900">Precio</th>
+                                                <th className="px-4 py-4 text-center font-bold text-gray-900">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {products.map((product, index) => (
+                                                <tr key={index} className="border-b hover:bg-gray-50">
+                                                    <td className="px-4 py-4">
+                                                        <div className="font-semibold">{product.Producto}</div>
+                                                    </td>
+                                                    <td className="px-4 py-4">
+                                                        <span className={`inline-block text-xs font-semibold px-3 py-1 rounded-full ${
+                                                            product.Segmento === 'Fibra + Móvil + TV' ? 'bg-purple-100 text-purple-800' :
+                                                            product.Segmento === 'Fibra + Móvil' ? 'bg-blue-100 text-blue-800' :
+                                                            product.Segmento === 'Fibra (solo internet)' ? 'bg-cyan-100 text-cyan-800' :
+                                                            product.Segmento === 'Móvil (solo línea)' ? 'bg-green-100 text-green-800' :
+                                                            product.Segmento === 'Líneas adicionales' ? 'bg-orange-100 text-orange-800' :
+                                                            'bg-gray-100 text-gray-800'
+                                                        }`}>
+                                                            {product.Segmento}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-4 py-4 text-sm text-gray-600">{product.Categoría}</td>
+                                                    <td className="px-4 py-4 text-center">
+                                                        <span className="font-bold text-blue-600 text-lg">{product.Precio}€</span>
+                                                    </td>
+                                                    <td className="px-4 py-4">
+                                                        <div className="flex justify-center gap-2">
+                                                            <button
+                                                                onClick={() => handleEditProduct(index)}
+                                                                className="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-2 rounded-lg font-semibold text-sm"
+                                                            >
+                                                                ✏️ Editar
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDeleteProduct(index)}
+                                                                className="bg-red-100 text-red-700 hover:bg-red-200 px-3 py-2 rounded-lg font-semibold text-sm"
+                                                            >
+                                                                🗑️ Eliminar
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Gestión de Comisiones */}
+                        {adminView === 'commissions' && (
+                            <div className="bg-white rounded-2xl shadow-lg p-8">
+                                <div className="mb-6">
+                                    <h2 className="text-2xl font-bold mb-2">💰 Gestión de Comisiones</h2>
+                                    <p className="text-gray-600">Modifica el porcentaje de comisión basado en el valor original (100%)</p>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {commissions.map((comm, index) => (
+                                        <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors border border-gray-200">
+                                            <div className="flex-1">
+                                                <div className="font-semibold text-gray-900 mb-1">{comm.producto}</div>
+                                                <div className="text-sm text-gray-600">{comm.segmento}</div>
+                                            </div>
+                                            <div className="flex gap-6 items-center">
+                                                <div className="text-center">
+                                                    <div className="text-xs text-gray-600 mb-1">Original (100%)</div>
+                                                    <div className="font-bold text-gray-900">{comm.comisionOriginal}€</div>
+                                                </div>
+                                                <div className="text-center">
+                                                    <div className="text-xs text-gray-600 mb-1">Actual</div>
+                                                    <div className="font-bold text-green-600 text-lg">{comm.comision90}€</div>
+                                                </div>
+                                                <div className="text-center">
+                                                    <div className="text-xs text-gray-600 mb-1">Porcentaje</div>
+                                                    <div className="font-bold text-purple-600">
+                                                        {Math.round((comm.comision90 / comm.comisionOriginal) * 100)}%
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => handleEditCommission(index)}
+                                                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold"
+                                                >
+                                                    ✏️ Editar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Gestión de Vendedores */}
+                        {adminView === 'sellers' && (
+                            <div className="bg-white rounded-2xl shadow-lg p-8">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-2xl font-bold">👥 Gestión de Comerciales</h2>
+                                    <button
+                                        onClick={() => setShowAddSellerModal(true)}
+                                        className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2"
+                                    >
+                                        ➕ Añadir Comercial
+                                    </button>
+                                </div>
+                                
+                                <div className="overflow-x-auto">
+                                    <table className="w-full">
+                                        <thead className="bg-gray-100">
+                                            <tr>
+                                                <th className="px-6 py-4 text-left font-bold text-gray-900">Comercial</th>
+                                                <th className="px-4 py-4 text-center font-bold text-gray-900">Rol</th>
+                                                <th className="px-4 py-4 text-center font-bold text-gray-900">Ventas</th>
+                                                <th className="px-4 py-4 text-center font-bold text-gray-900">Objetivo</th>
+                                                <th className="px-4 py-4 text-center font-bold text-gray-900">Comisiones</th>
+                                                <th className="px-4 py-4 text-center font-bold text-gray-900">Estado</th>
+                                                <th className="px-4 py-4 text-center font-bold text-gray-900">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {sellers.map(seller => (
+                                                <tr key={seller.id} className="border-b hover:bg-gray-50">
+                                                    <td className="px-6 py-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white ${
+                                                                seller.active ? 'bg-blue-500' : 'bg-gray-400'
+                                                            }`}>
+                                                                {seller.name.charAt(0).toUpperCase()}
+                                                            </div>
+                                                            <div>
+                                                                <div className="font-semibold text-gray-900">{seller.name}</div>
+                                                                <div className="text-sm text-gray-600">{seller.email}</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-4 py-4 text-center">
+                                                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
+                                                            seller.role === 'jefe_equipo' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                                                        }`}>
+                                                            {seller.role === 'jefe_equipo' ? '👔 Jefe de Equipo' : '💼 Comercial'}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-4 py-4 text-center">
+                                                        <span className="font-bold text-blue-600 text-lg">{seller.sales}</span>
+                                                    </td>
+                                                    <td className="px-4 py-4 text-center">
+                                                        <span className="font-semibold text-gray-700">{seller.target}</span>
+                                                    </td>
+                                                    <td className="px-4 py-4 text-center">
+                                                        <span className="font-bold text-green-600 text-lg">{seller.commission}€</span>
+                                                    </td>
+                                                    <td className="px-4 py-4 text-center">
+                                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
+                                                            seller.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                                        }`}>
+                                                            {seller.active ? '✓ Activo' : '✗ Inactivo'}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-4 py-4">
+                                                        <div className="flex justify-center gap-2">
+                                                            <button
+                                                                onClick={() => toggleSellerStatus(seller.id)}
+                                                                className={`px-3 py-2 rounded-lg font-semibold text-sm ${
+                                                                    seller.active 
+                                                                        ? 'bg-orange-100 text-orange-700 hover:bg-orange-200' 
+                                                                        : 'bg-green-100 text-green-700 hover:bg-green-200'
+                                                                }`}
+                                                                title={seller.active ? 'Desactivar' : 'Activar'}
+                                                            >
+                                                                {seller.active ? '⏸️ Desactivar' : '▶️ Activar'}
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDeleteSeller(seller.id)}
+                                                                className="bg-red-100 text-red-700 hover:bg-red-200 px-3 py-2 rounded-lg font-semibold text-sm"
+                                                                title="Eliminar vendedor"
+                                                            >
+                                                                🗑️ Eliminar
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {sellers.length === 0 && (
+                                    <div className="text-center py-12">
+                                        <span className="text-6xl">👥</span>
+                                        <h3 className="text-xl font-bold mt-4 mb-2">No hay comerciales</h3>
+                                        <p className="text-gray-600">Añade tu primer comercial para comenzar</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Modal Añadir Producto */}
+                    {showAddProductModal && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div className="bg-white rounded-2xl p-8 max-w-md w-full">
+                                <h3 className="text-xl font-bold mb-4">➕ Añadir Nuevo Producto</h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Nombre del producto *</label>
+                                        <input
+                                            type="text"
+                                            placeholder="Ej: 100 GB"
+                                            value={newProduct.Producto}
+                                            onChange={(e) => setNewProduct({...newProduct, Producto: e.target.value})}
+                                            className="w-full p-3 border-2 border-gray-200 rounded-xl"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Segmento *</label>
+                                        <select
+                                            value={newProduct.Segmento}
+                                            onChange={(e) => setNewProduct({...newProduct, Segmento: e.target.value})}
+                                            className="w-full p-3 border-2 border-gray-200 rounded-xl"
+                                        >
+                                            <option value="">Seleccionar segmento</option>
+                                            <option value="Móvil (solo línea)">Móvil (solo línea)</option>
+                                            <option value="Líneas adicionales">Líneas adicionales</option>
+                                            <option value="Fibra (solo internet)">Fibra (solo internet)</option>
+                                            <option value="Fibra + Móvil">Fibra + Móvil</option>
+                                            <option value="Fibra + Móvil + TV">Fibra + Móvil + TV</option>
+                                            <option value="Fibra Segunda Residencia">Fibra Segunda Residencia</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Categoría *</label>
+                                        <input
+                                            type="text"
+                                            placeholder="Ej: Móvil (solo línea)"
+                                            value={newProduct.Categoría}
+                                            onChange={(e) => setNewProduct({...newProduct, Categoría: e.target.value})}
+                                            className="w-full p-3 border-2 border-gray-200 rounded-xl"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Precio (€/mes) *</label>
+                                        <input
+                                            type="number"
+                                            placeholder="0"
+                                            value={newProduct.Precio}
+                                            onChange={(e) => setNewProduct({...newProduct, Precio: parseFloat(e.target.value) || 0})}
+                                            className="w-full p-3 border-2 border-gray-200 rounded-xl"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex gap-3 mt-6">
+                                    <button
+                                        onClick={() => {
+                                            setShowAddProductModal(false);
+                                            setNewProduct({ Segmento: '', Categoría: '', Producto: '', Precio: 0 });
+                                        }}
+                                        className="flex-1 bg-gray-200 hover:bg-gray-300 py-3 rounded-xl font-semibold"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        onClick={handleAddProduct}
+                                        className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-semibold"
+                                    >
+                                        Añadir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Modal Editar Producto */}
+                    {showEditProductModal && editingProduct && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div className="bg-white rounded-2xl p-8 max-w-md w-full">
+                                <h3 className="text-xl font-bold mb-4">✏️ Editar Producto</h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Nombre del producto *</label>
+                                        <input
+                                            type="text"
+                                            value={editingProduct.Producto}
+                                            onChange={(e) => setEditingProduct({...editingProduct, Producto: e.target.value})}
+                                            className="w-full p-3 border-2 border-gray-200 rounded-xl"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Segmento *</label>
+                                        <select
+                                            value={editingProduct.Segmento}
+                                            onChange={(e) => setEditingProduct({...editingProduct, Segmento: e.target.value})}
+                                            className="w-full p-3 border-2 border-gray-200 rounded-xl"
+                                        >
+                                            <option value="Móvil (solo línea)">Móvil (solo línea)</option>
+                                            <option value="Líneas adicionales">Líneas adicionales</option>
+                                            <option value="Fibra (solo internet)">Fibra (solo internet)</option>
+                                            <option value="Fibra + Móvil">Fibra + Móvil</option>
+                                            <option value="Fibra + Móvil + TV">Fibra + Móvil + TV</option>
+                                            <option value="Fibra Segunda Residencia">Fibra Segunda Residencia</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Categoría *</label>
+                                        <input
+                                            type="text"
+                                            value={editingProduct.Categoría}
+                                            onChange={(e) => setEditingProduct({...editingProduct, Categoría: e.target.value})}
+                                            className="w-full p-3 border-2 border-gray-200 rounded-xl"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Precio (€/mes) *</label>
+                                        <input
+                                            type="number"
+                                            value={editingProduct.Precio}
+                                            onChange={(e) => setEditingProduct({...editingProduct, Precio: parseFloat(e.target.value) || 0})}
+                                            className="w-full p-3 border-2 border-gray-200 rounded-xl"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex gap-3 mt-6">
+                                    <button
+                                        onClick={() => {
+                                            setShowEditProductModal(false);
+                                            setEditingProduct(null);
+                                            setEditingProductIndex(null);
+                                        }}
+                                        className="flex-1 bg-gray-200 hover:bg-gray-300 py-3 rounded-xl font-semibold"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        onClick={handleSaveEditProduct}
+                                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold"
+                                    >
+                                        Guardar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Modal Editar Comisión */}
+                    {showEditCommissionModal && editingCommission && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div className="bg-white rounded-2xl p-8 max-w-lg w-full">
+                                <h3 className="text-xl font-bold mb-4">✏️ Editar Comisión</h3>
+                                <div className="mb-4 p-4 bg-purple-50 rounded-xl border border-purple-200">
+                                    <div className="font-semibold text-gray-900 mb-1">{editingCommission.producto}</div>
+                                    <div className="text-sm text-gray-600">{editingCommission.segmento}</div>
+                                </div>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Comisión Original (100%)</label>
+                                        <input
+                                            type="text"
+                                            value={`${editingCommission.comisionOriginal}€`}
+                                            disabled
+                                            className="w-full p-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-600 font-bold"
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">💯 Por Porcentaje</label>
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    max="100"
+                                                    step="0.1"
+                                                    value={editingCommission.porcentaje}
+                                                    onChange={(e) => handleChangePercentage(e.target.value)}
+                                                    className="flex-1 p-3 border-2 border-purple-300 rounded-xl text-lg font-bold text-purple-600 focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+                                                />
+                                                <span className="text-xl font-bold text-purple-600">%</span>
+                                            </div>
+                                            <input
+                                                type="range"
+                                                min="0"
+                                                max="100"
+                                                step="1"
+                                                value={editingCommission.porcentaje}
+                                                onChange={(e) => handleChangePercentage(e.target.value)}
+                                                className="w-full mt-2"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">💶 Por Importe</label>
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    max={editingCommission.comisionOriginal}
+                                                    step="0.01"
+                                                    value={editingCommission.importeDirecto}
+                                                    onChange={(e) => handleChangeImporte(e.target.value)}
+                                                    className="flex-1 p-3 border-2 border-green-300 rounded-xl text-lg font-bold text-green-600 focus:border-green-500 focus:ring-2 focus:ring-green-200"
+                                                />
+                                                <span className="text-xl font-bold text-green-600">€</span>
+                                            </div>
+                                            <div className="text-xs text-gray-500 mt-2 text-center">
+                                                Máximo: {editingCommission.comisionOriginal}€
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border-2 border-green-200">
+                                        <div className="text-center">
+                                            <div className="text-sm text-gray-600 mb-2">✅ Nueva comisión aplicada:</div>
+                                            <div className="text-4xl font-bold text-green-600 mb-1">
+                                                {editingCommission.importeDirecto.toFixed(2)}€
+                                            </div>
+                                            <div className="text-lg font-semibold text-purple-600">
+                                                ({editingCommission.porcentaje.toFixed(1)}% del valor original)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex gap-3 mt-6">
+                                    <button
+                                        onClick={() => {
+                                            setShowEditCommissionModal(false);
+                                            setEditingCommission(null);
+                                            setEditingCommissionIndex(null);
+                                        }}
+                                        className="flex-1 bg-gray-200 hover:bg-gray-300 py-3 rounded-xl font-semibold"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        onClick={handleSaveEditCommission}
+                                        className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-semibold"
+                                    >
+                                        💾 Guardar Cambios
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Modal Añadir Vendedor */}
+                    {showAddSellerModal && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div className="bg-white rounded-2xl p-8 max-w-md w-full">
+                                <h3 className="text-xl font-bold mb-4">➕ Añadir Nuevo Comercial</h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Nombre completo *</label>
+                                        <input
+                                            type="text"
+                                            placeholder="Ej: Juan Pérez"
+                                            value={newSeller.name}
+                                            onChange={(e) => setNewSeller({...newSeller, name: e.target.value})}
+                                            className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Email *</label>
+                                        <input
+                                            type="email"
+                                            placeholder="correo@ejemplo.com"
+                                            value={newSeller.email}
+                                            onChange={(e) => setNewSeller({...newSeller, email: e.target.value})}
+                                            className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Rol *</label>
+                                        <select
+                                            value={newSeller.role}
+                                            onChange={(e) => setNewSeller({...newSeller, role: e.target.value})}
+                                            className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+                                        >
+                                            <option value="comercial">💼 Comercial</option>
+                                            <option value="jefe_equipo">👔 Jefe de Equipo</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Objetivo mensual de ventas *</label>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            placeholder="40"
+                                            value={newSeller.target}
+                                            onChange={(e) => setNewSeller({...newSeller, target: parseInt(e.target.value) || 40})}
+                                            className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex gap-3 mt-6">
+                                    <button
+                                        onClick={() => {
+                                            setShowAddSellerModal(false);
+                                            setNewSeller({ name: '', email: '', role: 'comercial', target: 40 });
+                                        }}
+                                        className="flex-1 bg-gray-200 hover:bg-gray-300 py-3 rounded-xl font-semibold"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        onClick={handleAddSeller}
+                                        className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-semibold"
+                                    >
+                                        ➕ Añadir Comercial
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // Renderizado principal
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<O2ProfessionalConfigurator />);
+    </script>
+</body>
+</html>
